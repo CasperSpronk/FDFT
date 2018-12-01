@@ -5,37 +5,57 @@
 % Casper Spronk
 clear all
 close all
+clc
 %% Deterministic Limit Checks
-limit = 0.25;
-mean_change = 2;
-Noise               = wgn(1,1000, 1);
-x = Noise;
-x = [x mean_change+Noise];
-k = 100; 
+% Setting up signal with noise and mean change
+k0                     = 1001;                                             % Time instant when the mean of the signal changes
+Mean1                  = 10;
+Mean_Change            = 2;
+Mean2                  = Mean1 + Mean_Change;
+k0                     = 1001;                                             % Time instant when the mean of the signal changes
+Noise                  = wgn(1,(k0-1)*2,1);                                % White Gaussian Noise with variance 1
+z1                     = Mean1 + Noise(1:k0-1);
+z2                     = Mean2 + Noise(1+length(Noise)/2:end);
+z                      = [z1 z2];                                          % The discrete time signal
 
-
-out = deterministic_limit(x,limit);
-% plot(x)
-% hold on
-plot(out)
-hold on
-plot(limit*ones(1,length(x)))
-hold on
-plot(-limit*ones(1,length(x)))
-
-%% Windowed Deterministic Limit Check
-[new_out, average] = new_deterministic_limit(x,limit,k);
+% plotting the discrete time signal z
 figure
-% plot(x)
-% hold on
-plot(new_out)
+plot(z)
 hold on
-plot(limit*ones(1,length(x)))
-hold on
-plot(-limit*ones(1,length(x)))
-hold on
-plot(average)
+Mean1_Vec              = Mean1 * ones(1,k0-1);
+Mean2_Vec              = Mean2 * ones(1,k0-1);
+Mean                   = [Mean1_Vec Mean2_Vec];
+stairs(Mean)
+hold off
 
+%Setting up Deterministic Limit check
+Limit_Size             = Mean_Change / 2;
+Upper_Limit            = Mean1 + Limit_Size;
+Lower_Limit            = Mean1 - Limit_Size;
+Output_Test1            = Deterministic_Limit(z, Upper_Limit, Lower_Limit);
+
+% Plotting Results of test
+figure
+plot( z )
+hold on
+grid on
+stairs( Mean                           , 'color', 'k' )
+stairs( Output_Test1 )
+plot( Upper_Limit * ones(1,length(z)), 'color', 'r' )
+plot( Lower_Limit * ones(1,length(z)), 'color', 'r' )
+hold off
+%% Windowed Deterministic Limit Check
+W = 10;
+[Output_Test2, Average] = Averaged_Deterministic_Limit(z, Upper_Limit, Lower_Limit, W);
+figure
+plot( z )
+hold on
+plot(Output_Test2)
+stairs( Mean                         , 'color', 'k' )
+plot( Upper_Limit * ones(1,length(z)), 'color', 'r' )
+plot( Lower_Limit * ones(1,length(z)), 'color', 'r' )
+plot(Average)
+hold off
 
 %% Probablistic test
 meanEst = zeros(1,length(x));
