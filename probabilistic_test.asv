@@ -1,0 +1,11 @@
+function out = prob_test(z, varianceSquared, meanEst, alpha)
+    out = zeros(1,length(z));
+    for i 
+    deviation = abs(abs(meanEst) - abs(z));
+    standerd_deviation = deviation / varianceSquared;
+    if standerd_deviation > alpha
+        out = 1;
+    else
+        out = 0;
+    end
+end
