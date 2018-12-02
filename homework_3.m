@@ -9,9 +9,8 @@ clc
 %% Setting up signal with noise and mean change
 k0                     = 1001;                                             % Time instant when the mean of the signal changes
 Mean1                  = 10;
-Mean_Change            = 100;
+Mean_Change            = 10;
 Mean2                  = Mean1 + Mean_Change;
-k0                     = 1001;                                             % Time instant when the mean of the signal changes
 Noise                  = wgn(1,(k0-1)*2,1);                                % White Gaussian Noise with variance 1
 z1                     = Mean1 + Noise(1:k0-1);
 z2                     = Mean2 + Noise(1+length(Noise)/2:end);
@@ -77,8 +76,6 @@ VarianceSquared = zeros(1,length(z));
 
 for i = 3:length(z)
    VarianceSquared(i) = (i-2)/(i-1) * VarianceSquared(i-1) + (1/i) * ((z(i) - MeanEst(i-1))^2);
-   disp(i)
-   disp(((z(i) - MeanEst(i-1))^2)/i)
 end
 out = probabilistic_test(z, MeanEst, VarianceSquared, alpha);
 
