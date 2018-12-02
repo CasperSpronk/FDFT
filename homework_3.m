@@ -6,11 +6,10 @@
 clear all
 close all
 clc
-%% Deterministic Limit Checks
-% Setting up signal with noise and mean change
+%% Setting up signal with noise and mean change
 k0                     = 1001;                                             % Time instant when the mean of the signal changes
 Mean1                  = 10;
-Mean_Change            = 1;
+Mean_Change            = 2;
 Mean2                  = Mean1 + Mean_Change;
 k0                     = 1001;                                             % Time instant when the mean of the signal changes
 Noise                  = wgn(1,(k0-1)*2,1);                                % White Gaussian Noise with variance 1
@@ -28,6 +27,9 @@ Mean                   = [Mean1_Vec Mean2_Vec];
 stairs(Mean, 'color','k')
 hold off
 
+
+%% Deterministic Limit Check
+
 %Setting up Deterministic Limit check
 Limit_Size             = Mean_Change / 2;
 Upper_Limit            = Mean1 + Limit_Size;
@@ -44,11 +46,12 @@ stairs( Output_Test1 )
 plot( Upper_Limit * ones(1,length(z)), 'color', 'r' )
 plot( Lower_Limit * ones(1,length(z)), 'color', 'r' )
 hold off
-%% Windowed Deterministic Limit Check
+
+%% Averaged Deterministic Limit Check
 
 W = 30;
 
-Average = movmean(z,W,'omitnan');                                   % Averaging signal
+Average = movmean(z,[W 0],'omitnan');                                   % Averaging signal
 Output_Test2 = (Average > Upper_Limit) | (Average < Lower_Limit);   % Checking against limits
 
 figure
@@ -62,23 +65,21 @@ plot(Average, 'linewidth', 2, 'color', 'm')
 %legend TODO
 hold off
 
-%% Probablistic test
-meanEst = zeros(1,length(x));
-for i = 2:length(x)
-    meanEst(i) = meanEst(i-1) + 1/i * (x(i) - meanEst(i-1)); 
+%% Probabilistic Method
+
+MeanEst = zeros(1,length(z));
+for i = 2:length(z)
+    MeanEst(i) = MeanEst(i-1) + 1/i * (z(i) - MeanEst(i-1)); 
 end
 
-variancesquared = zeros(1,length(x));
+VarianceSquared = zeros(1,length(z));
 
-for i = 3:length(x)
-    disp(i)
-    disp(variancesquared(i))
-    disp(x(i))
-    disp(meanEst(i))
-    variancesquared = (i-2)/(i-1) * variancesquared(i-1) + (x(i) - meanEst(i-1))^2;
+for i = 3:length(z)
+   VarianceSquared(i) = (i-2)/(i-1) * VarianceSquared(i-1) + (1/i)*(z(i) - MeanEst(i-1))^2;
 end
 
 figure
-plot(x)
+plot(z)
 hold on
-plot(meanEst)
+plot(MeanEst)
+plot(VarianceSquared)
