@@ -1,4 +1,10 @@
-%% Homework 3
+% % Homework 3 
+%       Generate a synthetic multi-sinusoidal signal: one fundamental frequency and some upper harmonics. Make the fundamental and harmonics frequencies vary in time (to simulate vibrations from a machine rotating at different speeds).
+% 
+%       Introduce a “fault” by introducing either a spurious new frequency component,
+%      or alter the magnitude or phase of some upper harmonics.
+%                 Write an algorithm to detect this
+
 close all
 clear all
 

@@ -10,7 +10,7 @@ clc
 % Setting up signal with noise and mean change
 k0                     = 1001;                                             % Time instant when the mean of the signal changes
 Mean1                  = 10;
-Mean_Change            = 2;
+Mean_Change            = 1;
 Mean2                  = Mean1 + Mean_Change;
 k0                     = 1001;                                             % Time instant when the mean of the signal changes
 Noise                  = wgn(1,(k0-1)*2,1);                                % White Gaussian Noise with variance 1
@@ -25,14 +25,14 @@ hold on
 Mean1_Vec              = Mean1 * ones(1,k0-1);
 Mean2_Vec              = Mean2 * ones(1,k0-1);
 Mean                   = [Mean1_Vec Mean2_Vec];
-stairs(Mean)
+stairs(Mean, 'color','k')
 hold off
 
 %Setting up Deterministic Limit check
 Limit_Size             = Mean_Change / 2;
 Upper_Limit            = Mean1 + Limit_Size;
 Lower_Limit            = Mean1 - Limit_Size;
-Output_Test1            = Deterministic_Limit(z, Upper_Limit, Lower_Limit);
+Output_Test1           = (z > Upper_Limit) | (z < Lower_Limit);
 
 % Plotting Results of test
 figure
@@ -45,16 +45,21 @@ plot( Upper_Limit * ones(1,length(z)), 'color', 'r' )
 plot( Lower_Limit * ones(1,length(z)), 'color', 'r' )
 hold off
 %% Windowed Deterministic Limit Check
-W = 10;
-[Output_Test2, Average] = Averaged_Deterministic_Limit(z, Upper_Limit, Lower_Limit, W);
+
+W = 30;
+
+Average = movmean(z,W,'omitnan');                                   % Averaging signal
+Output_Test2 = (Average > Upper_Limit) | (Average < Lower_Limit);   % Checking against limits
+
 figure
 plot( z )
 hold on
-plot(Output_Test2)
+stairs(Output_Test2)
 stairs( Mean                         , 'color', 'k' )
 plot( Upper_Limit * ones(1,length(z)), 'color', 'r' )
 plot( Lower_Limit * ones(1,length(z)), 'color', 'r' )
-plot(Average)
+plot(Average, 'linewidth', 2, 'color', 'm')
+%legend TODO
 hold off
 
 %% Probablistic test
