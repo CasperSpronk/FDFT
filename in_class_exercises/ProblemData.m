@@ -22,23 +22,36 @@ tankMaxNom = tankMax * (1 + 0.1 * (rand(1) - 1/2));
 
 pipeCrossNom = pipeCross * (1 + 0.1 * (rand(1) - 1/2));
 pipeCoeffNom = pipeCoeff * (1 + 0.1 * (rand(1) - 1/2));
+%% observer parameters
+lambda = 0.5;
 %% Generating a random seed and running the simulink file
 seed1 = randi([1 100000]);
 seed2 = randi([1 100000]);
 seed3 = randi([1 100000]);
-simOut = sim("task_1_2_v01.slx");
+simOut = sim("task_1_2_v01_observer.slx");
+
 
 %% plots
+close all
+figure("name","real system vs model")
 hold on
 grid on
-plot(tankTrueLevel1.time,tankTrueLevel1.data)
-plot(tankTrueLevel2.time,tankTrueLevel2.data)
-plot(tankTrueLevel3.time,tankTrueLevel3.data)
-plot(tankNomLevel1.time,tankNomLevel1.data)
-plot(tankNomLevel2.time,tankNomLevel2.data)
-plot(tankNomLevel3.time,tankNomLevel3.data)
+plot(tankTrueLevel.time,tankTrueLevel.data)
+plot(tankNomLevel.time,tankNomLevel.data)
 legend("Tank 1 true level","Tank 2 true level","Tank 3 true level","Tank 1 nominal level","Tank 2 nominal level","Tank 3 nominal level")
 
 
+figure("name","real system vs observer")
+hold on
+grid on
+plot(tankTrueLevel.time,tankTrueLevel.data)
+plot(tankObsLevel.time,tankObsLevel.data)
+legend("Tank 1 true level","Tank 2 true level","Tank 3 true level","Tank 1 observer level","Tank 2 observer level","Tank 3 observer level")
+
+figure("name","residual levels observer")
+hold on 
+grid on
+plot(residual_Q4.time,residual_Q4.data)
+legend("residual tank 1","residual tank 2","residual tank 3")
 
 
