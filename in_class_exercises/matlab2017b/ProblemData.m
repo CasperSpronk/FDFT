@@ -1,7 +1,7 @@
 clc
 clear all
 close all
-%%
+%% system parameters
 tankCross = [0.156 0.156 0.156];
 tankInit = [0 2.5 5];
 tankMax = [10 10 10];
@@ -12,8 +12,8 @@ pipeCoeff = [1 1 1];
 
 pumpConst = [1.5 1.5]*1e-3;
 
-faultTime = [500 1e6 1e6];
-faultMag = [1 0 0];
+faultTime = [1e6 1e6 1e6];
+faultMag = [0 0 0];
 sampleTime = 0.1;
 %% nominal parameters
 tankCrossNom = tankCross * (1 + 0.1 * (rand(1) - 1/2));
@@ -23,8 +23,8 @@ tankMaxNom = tankMax * (1 + 0.1 * (rand(1) - 1/2));
 pipeCrossNom = pipeCross * (1 + 0.1 * (rand(1) - 1/2));
 pipeCoeffNom = pipeCoeff * (1 + 0.1 * (rand(1) - 1/2));
 %% observer parameters
-lambda = 0.01;
-tankInitObs = tankInitNom;%* 1.5;%(1 + 0.2 * (rand(1) - 1/2));
+lambda = 0.05;
+tankInitObs = tankInitNom;
 %% Generating a random seed and running the simulink file
 seed1 = randi([1 100000]);
 seed2 = randi([1 100000]);
@@ -34,31 +34,32 @@ simOut = sim("task_1_2_v01_observer.slx");
 fault_pipe1 = zeros(length(residual_Q4.data(:,1)),1);
 fault_pipe2 = zeros(length(residual_Q4.data(:,2)),1);
 fault_pipe3 = zeros(length(residual_Q4.data(:,3)),1);
-delta = 0.0011;
-nextAbsEstResidualVec = zeros(length(residual_Q4.data(:,3)),1);
+delta = 0.02;
+nextAbsEstResidualVec1 = zeros(length(residual_Q4.data(:,3)),1);
+nextAbsEstResidualVec2 = zeros(length(residual_Q4.data(:,3)),1);
+nextAbsEstResidualVec3 = zeros(length(residual_Q4.data(:,3)),1);
+
+% These for loops run check if the residual level is greater than the
+% threshold. If the residual exceeds the threshold the system will return a
+% fault (1), otherwise if will return a 0. 
 for i = 2:length(fault_pipe1)
     % if fault(i-1) == 0
-    nextAbsEstResidualVec(i) = abs(residual_Q4.data(i-1,1)) + delta;
-   
-    %nextAbsEstResidualVec(i) = nextAbsEstResidual1;
-    if abs(nextAbsEstResidualVec(i)) < abs(residual_Q4.data(i))
+    nextAbsEstResidualVec1(i) = lambda * abs(residual_Q4.data(i-1,1)) + delta;
+    if abs(nextAbsEstResidualVec1(i)) < abs(residual_Q4.data(i))
         fault_pipe1(i) = 1;
     end
 end
 for i = 2:length(fault_pipe1)
-    if fault(i-1) == 0
-        nextAbsEstResidual2 = lambda * abs(residual_Q4.data(i-1,2)) + delta;
-    end
-    if nextAbsEstResidual2 < residual_Q4.data(i)
-        fault_pipe2(i) = 1;
+    % if fault(i-1) == 0
+    nextAbsEstResidualVec2(i) = lambda * abs(residual_Q4.data(i-1,1)) + delta;
+    if abs(nextAbsEstResidualVec2(i)) < abs(residual_Q4.data(i))
+        fault_pipe1(i) = 1;
     end
 end
 for i = 2:length(fault_pipe1)
-    if fault(i-1) == 0
-        nextAbsEstResidual3 = lambda * abs(residual_Q4.data(i-1,3)) + delta;
-    end
-    if nextAbsEstResidual3 < residual_Q4.data(i)
-        fault_pipe3(i) = 1;
+    nextAbsEstResidualVec3(i) = lambda * abs(residual_Q4.data(i-1,1)) + delta;
+    if abs(nextAbsEstResidualVec3(i)) < abs(residual_Q4.data(i))
+        fault_pipe1(i) = 1;
     end
 end
 %% plots
@@ -85,7 +86,6 @@ plot(residual_Q4.time,residual_Q4.data)
 plot(residual_Q4.time,fault_pipe1)
 plot(residual_Q4.time,fault_pipe2)
 plot(residual_Q4.time,fault_pipe3)
-plot(residual_Q4.time,nextAbsEstResidualVec)
 legend("residual tank 1","residual tank 2","residual tank 3","fault pipe 1","fault pipe 2","fault pipe 3")
 
 
