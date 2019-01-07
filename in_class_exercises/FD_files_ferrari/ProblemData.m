@@ -1,3 +1,5 @@
+clc
+clear all
 % Sampling time, stop time
 Ts = 0.01;
 Tstop = 1000;
@@ -44,3 +46,21 @@ pipeCoeffN = makeParUncertain(pipeCoeff,uncRelative);
 % FD estimator parameters
 
 Lambda = diag([0.91 0.91 0.91]);
+
+
+simOut = sim("centralized_FD_basic_01.slx");
+%% plots
+figure("name","real system vs observer")
+hold on
+grid on
+plot(y.time,y.data)
+plot(y_hat.time,y_hat.data)
+legend("Tank 1 true level","Tank 2 true level","Tank 3 true level","Tank 1 observer level","Tank 2 observer level","Tank 3 observer level")
+
+
+figure("name","real system vs LFD without delay")
+hold on
+grid on
+plot(y.time,y.data)
+plot(y_hat_LFD_no_delays_minus_y_hat.time,y_hat_LFD_no_delays_minus_y_hat.data)
+legend("Tank 1 true level","Tank 2 true level","Tank 3 true level","Tank 1 observer level","Tank 2 observer level","Tank 3 observer level")
