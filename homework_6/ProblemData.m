@@ -118,11 +118,17 @@ hold on
 plot(pumpValuesPartialFaultActuatorLinear.time,pumpValuesPartialFaultActuatorLinear.data)
 legend("pump 1 linear","pump 2 linear","pump 1 faulty actuator","pump 2 faulty actuator")
 
+%% observer design
+L = place(A,C,p);
 %% full failure sensor
 Cf = [1 0 0;
       0 1 0
       0 0 1];
 
+  
+  
+  
+  
 %% full failure actuator
 Bf = [1/tankCross(1);
      0;
