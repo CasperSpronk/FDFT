@@ -101,10 +101,9 @@ plot(pumpValuesPartialFaultSensorLinear.time,pumpValuesPartialFaultSensorLinear.
 legend("tank 1","tank 2","tank 1 faulty actuator","tank 2 faulty actuator")
 %% partial failure actuator
 close all
-B = [1/tankCross(1);
-     1/tankCross(2)];
-Bf = [1/tankCross(1);
-     (1/tankCross(2))/2];
+Bf = [1/tankCross(1) 0;
+      0 (1/tankCross(2))/2;
+      0 0];
 
 N = (Bf' * Bf)^-1 * Bf' * B;
  
