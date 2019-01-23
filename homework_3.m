@@ -65,6 +65,17 @@ plot(Average, 'linewidth', 2, 'color', 'm')
 hold off
 
 %% Probabilistic Method
+k                      = 100000
+k0                     = 1001;                                             % Time instant when the mean of the signal changes
+Mean1                  = 10;
+Mean_Change            = 10;
+Mean2                  = Mean1 + Mean_Change;
+Noise                  = wgn(1,(k)*2,1);                                % White Gaussian Noise with variance 1
+z1                     = Mean1 + Noise(1:k);
+z2                     = Mean2 + Noise(1:k0);
+z                      = [z1 z2];                                          % The discrete time signal
+
+
 alpha = 2;
 MeanEst = zeros(1,length(z));
 MeanEst(1) = z(1);

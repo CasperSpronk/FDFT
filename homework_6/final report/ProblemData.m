@@ -67,11 +67,13 @@ A = [A11 A12 A13;
      A21 A22 A23;
      A31 A32 A33];
  
-B = [1/tankCross(1);
-     1/tankCross(2);
-     0];
+B = [1/tankCross(1) 0;
+     0 1/tankCross(2);
+     0 0];
 
-C = [1 1 1];
+C = [1 0 0;
+     0 1 0 
+     0 0 1];
 
 p = [-1 -1.1 -1.2];
 
@@ -83,40 +85,51 @@ sim("linear_model_linear_input");
 %% Run normal linear model with nonlinear input
 sim("linear_model_nonlinear");
 %% partial failure sensor
-Cf = [1 0.5 1];
+Cf = [1 0 0
+      0 0.5 0 
+      0 0 1];
 P = C * Cf' * (Cf * Cf')^-1;
+%%
 run = sim("linear_model_partial_fault_sensor_linear");
 plot(tankValuesHealthyLinear.time,tankValuesHealthyLinear.data)
 ylim([0 10])
 legend("tank 1","tank 2","tank 3")
 
 figure
-plot(pumpValues.time,pumpValues.data)
+plot(pumpValuesLinear.time,pumpValuesLinear.data)
 hold on
 plot(pumpValuesPartialFaultSensorLinear.time,pumpValuesPartialFaultSensorLinear.data)
 legend("tank 1","tank 2","tank 1 faulty actuator","tank 2 faulty actuator")
 %% partial failure actuator
 close all
-Bf = [1/tankCross(1);
-     (1/tankCross(2))/2;
-     0];
+Bf = [1/tankCross(1) 0;
+      0 (1/tankCross(2))/2;
+      0 0];
 
 N = (Bf' * Bf)^-1 * Bf' * B;
  
 run = sim("linear_model_partial_fault_actuator_linear");
-plot(tankValues.time,tankValues.data)
+plot(tankValuesPartialFaultActuatorLinear.time,tankValuesPartialFaultActuatorLinear.data)
 ylim([0 10])
 legend("tank 1","tank 2","tank 3")
 
 figure
 plot(pumpValuesLinear.time,pumpValuesLinear.data)
 hold on
-plot(pumpValuesPartialFaultActuator.time,pumpValuesPartialFaultActuator.data)
-legend("tank 1","tank 2","tank 1 faulty actuator","tank 2 faulty actuator")
+plot(pumpValuesPartialFaultActuatorLinear.time,pumpValuesPartialFaultActuatorLinear.data)
+legend("pump 1 linear","pump 2 linear","pump 1 faulty actuator","pump 2 faulty actuator")
 
+%% observer design
+L = place(A',C',p);
 %% full failure sensor
-Cf = [1 0 1];
-
+Cf = [1 0 0;
+      0 0.5 0
+      0 0 1];
+Cv = C - P*Cf;
+  
+  
+  
+  
 %% full failure actuator
 Bf = [1/tankCross(1);
      0;
